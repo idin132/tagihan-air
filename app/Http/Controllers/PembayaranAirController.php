@@ -7,6 +7,7 @@ use App\Models\Pengelola;
 use App\Models\PembayaranAir;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PembayaranAirController extends Controller
 {
@@ -27,29 +28,22 @@ class PembayaranAirController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'no_pelanggan' => 'required',
-            'bulan' => 'required',
-            'stand_meter_awal' => 'required|numeric',
-            'stand_meter_akhir' => 'required|numeric|gte:stand_meter_awal',
-            'no_pengelola' => 'required',
-        ]);
+        // SEBELUMNYA: kamu menghitung total_tagihan di sini
+        // $total_tagihan = ($request->akhir - $request->awal) * 5000;
 
-        $total_pakai = $request->stand_meter_akhir - $request->stand_meter_awal;
-        $total_tagihan = ($total_pakai * 3500) + 20000; // Contoh harga 3500 per m3 + biaya abodemen 20000
-
-        $data = PembayaranAir::create([
+        // SEKARANG: Langsung simpan saja, biarkan TRIGGER yang menghitung
+        PembayaranAir::create([
             'bulan' => $request->bulan,
             'no_pelanggan' => $request->no_pelanggan,
             'stand_meter_awal' => $request->stand_meter_awal,
             'stand_meter_akhir' => $request->stand_meter_akhir,
-            'stand_meter_total' => $total_pakai,
-            'total_tagihan' => $total_tagihan,
-            'tanggal_pembayaran' => $request->tanggal_pembayaran ?? now(),
-            'no_pengelola' => $request->no_pengelola,
+            'tanggal_pembayaran' => $request->tanggal_pembayaran,
+            'no_pengelola' => auth()->id(),
+            // stand_meter_total dan total_tagihan TIDAK USAH dimasukkan, 
+            // karena akan diisi otomatis oleh database
         ]);
 
-        return response()->json(['success' => true, 'message' => 'Tagihan berhasil dibuat!']);
+        return response()->json(['success' => true, 'message' => 'Data tersimpan!']);
     }
 
     public function edit($id)
@@ -86,6 +80,19 @@ class PembayaranAirController extends Controller
         return response()->json(['success' => true, 'message' => 'Data berhasil dihapus!']);
     }
 
+    // public function cetakLaporan(Request $request)
+    // {
+    //     // SEBELUMNYA: PembayaranAir::with('pelanggan')->where...->get();
+
+    //     // SEKARANG: Panggil dari View (Tabel Virtual)
+    //     $pembayarans = DB::table('view_laporan_lengkap')
+    //         ->whereBetween('tanggal_pembayaran', [$request->awal, $request->akhir])
+    //         ->get();
+
+    //     $pdf = Pdf::loadView('pembayaran.laporan_pdf', compact('pembayarans'));
+    //     return $pdf->stream();
+    // }
+
     public function cetakLaporan(Request $request)
     {
         $request->validate([
@@ -114,5 +121,19 @@ class PembayaranAirController extends Controller
 
         // Download atau stream ke browser
         return $pdf->stream('Laporan_Tagihan_' . $awal . '_ke_' . $akhir . '.pdf');
+    }
+
+    public function rekapBulanan(Request $request)
+    {
+        $bulan = $request->get('bulan', date('F')); // Default bulan sekarang
+
+        // Memanggil Stored Procedure
+        // DB::select selalu mengembalikan array of objects
+        $rekap = DB::select('CALL rekap_pendapatan_bulan(?)', [$bulan]);
+
+        // Karena procedure rekap_pendapatan_bulan cuma mengembalikan 1 baris, kita ambil index ke-0
+        $dataRekap = $rekap[0] ?? null;
+
+        return view('pembayaran.rekap', compact('dataRekap', 'bulan'));
     }
 }
