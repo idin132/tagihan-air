@@ -26,6 +26,14 @@ class PembayaranAirController extends Controller
         return view('pembayaran.index', compact('pembayarans', 'pelanggans', 'pengelolas'));
     }
 
+    public function show($id)
+    {
+        // Mengambil data pembayaran beserta relasi pelanggan dan pengelola
+        $pembayaran = PembayaranAir::with(['pelanggan', 'pengelola'])->findOrFail($id);
+
+        return response()->json($pembayaran);
+    }
+
     public function store(Request $request)
     {
         // SEBELUMNYA: kamu menghitung total_tagihan di sini
@@ -79,19 +87,6 @@ class PembayaranAirController extends Controller
         PembayaranAir::destroy($id);
         return response()->json(['success' => true, 'message' => 'Data berhasil dihapus!']);
     }
-
-    // public function cetakLaporan(Request $request)
-    // {
-    //     // SEBELUMNYA: PembayaranAir::with('pelanggan')->where...->get();
-
-    //     // SEKARANG: Panggil dari View (Tabel Virtual)
-    //     $pembayarans = DB::table('view_laporan_lengkap')
-    //         ->whereBetween('tanggal_pembayaran', [$request->awal, $request->akhir])
-    //         ->get();
-
-    //     $pdf = Pdf::loadView('pembayaran.laporan_pdf', compact('pembayarans'));
-    //     return $pdf->stream();
-    // }
 
     public function cetakLaporan(Request $request)
     {

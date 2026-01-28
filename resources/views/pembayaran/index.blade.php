@@ -82,6 +82,10 @@
                                 class="text-blue-600 hover:bg-blue-50 p-2 rounded-lg"><i class="fas fa-edit"></i></button>
                             <button onclick="hapusPembayaran({{ $p->id }})"
                                 class="text-red-600 hover:bg-red-50 p-2 rounded-lg"><i class="fas fa-trash"></i></button>
+                            <button onclick="showDetail({{ $p->id }})"
+                                class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Lihat Detail">
+                                <i class="fas fa-eye text-sm"></i>
+                            </button>
                         </td>
                     </tr>
                 @endforeach
@@ -156,62 +160,55 @@
 </div>
 
 <div id="modalDetail"
-    class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center backdrop-blur-sm">
-    <div class="bg-white rounded-[32px] shadow-xl w-full max-w-lg p-0 relative overflow-hidden">
-        <div class="bg-blue-600 p-8 text-white">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mb-1">Rincian Tagihan</p>
-                    <h3 class="text-2xl font-bold" id="det_bulan">Januari 2026</h3>
-                </div>
-                <button onclick="closeDetail()" class="text-white/50 hover:text-white transition text-xl">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+    class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center backdrop-blur-sm px-4">
+    <div class="bg-white rounded-[32px] shadow-xl w-full max-w-lg overflow-hidden relative">
+        <div class="p-6 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-slate-800">Rincian Transaksi</h3>
+            <button onclick="closeDetail()" class="text-slate-400 hover:text-slate-600"><i
+                    class="fas fa-times"></i></button>
         </div>
 
-        <div class="p-8 space-y-6">
-            <div class="flex items-start gap-4 pb-6 border-b border-slate-100">
-                <div
-                    class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-user text-xl"></i>
-                </div>
+        <div class="p-8 space-y-5">
+            <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <h4 class="font-bold text-slate-800 text-lg" id="det_nama">Nama Pelanggan</h4>
-                    <p class="text-sm text-slate-500" id="det_alamat">Alamat Lengkap Pelanggan...</p>
-                    <span
-                        class="inline-block mt-2 px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-bold uppercase tracking-tight"
-                        id="det_id">ID: #001</span>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pelanggan</p>
+                    <h4 id="det_nama" class="font-black text-slate-800">-</h4>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Bulan</p>
+                    <span id="det_bulan"
+                        class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg font-bold text-xs">-</span>
                 </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-4 py-2">
-                <div class="text-center p-4 bg-slate-50 rounded-2xl">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Awal</p>
-                    <p class="font-bold text-slate-700" id="det_awal">0</p>
+            <div class="grid grid-cols-3 gap-2 py-4 border-y border-slate-50">
+                <div class="text-center">
+                    <p class="text-[10px] text-slate-400 uppercase">Awal</p>
+                    <p id="det_awal" class="font-bold text-slate-700">-</p>
                 </div>
-                <div class="text-center p-4 bg-slate-50 rounded-2xl">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Akhir</p>
-                    <p class="font-bold text-slate-700" id="det_akhir">0</p>
+                <div class="text-center">
+                    <p class="text-[10px] text-slate-400 uppercase">Akhir</p>
+                    <p id="det_akhir" class="font-bold text-slate-700">-</p>
                 </div>
-                <div class="text-center p-4 bg-blue-50 rounded-2xl border border-blue-100">
-                    <p class="text-[10px] font-bold text-blue-400 uppercase mb-1">Total</p>
-                    <p class="font-bold text-blue-700" id="det_total">0 m³</p>
+                <div class="text-center">
+                    <p class="text-[10px] text-slate-400 uppercase">Total</p>
+                    <p id="det_total_m3" class="font-bold text-blue-600">-</p>
                 </div>
             </div>
 
-            <div
-                class="bg-slate-900 rounded-3xl p-6 text-white flex justify-between items-center shadow-lg shadow-slate-200">
-                <div>
-                    <p class="text-slate-400 text-[10px] font-bold uppercase">Total Pembayaran</p>
-                    <h2 class="text-2xl font-black text-emerald-400" id="det_tagihan">Rp 0</h2>
-                </div>
-                <i class="fas fa-check-circle text-3xl text-emerald-500"></i>
+            <div class="bg-slate-900 p-6 rounded-3xl text-white">
+                <p class="text-xs opacity-70 mb-1">Total Tagihan</p>
+                <h2 id="det_bayar" class="text-2xl font-black">Rp 0</h2>
             </div>
 
-            <div class="flex justify-between items-center text-[11px] text-slate-400 pt-2 font-medium">
-                <p>Petugas: <span class="text-slate-600" id="det_petugas">Admin</span></p>
-                <p>Tgl Bayar: <span class="text-slate-600" id="det_tgl">01/01/2026</span></p>
+            <div class="pt-2 space-y-1">
+                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">Informasi Sistem</p>
+                <div class="text-[11px] text-slate-500 space-y-1 italic">
+                    <p><i class="fas fa-user-shield mr-2"></i>Petugas: <span id="det_petugas"
+                            class="font-semibold not-italic text-slate-700">-</span></p>
+                    <p><i class="fas fa-calendar-alt mr-2"></i>Dibuat: <span id="det_created">-</span></p>
+                    <p><i class="fas fa-history mr-2"></i>Terakhir Diubah: <span id="det_updated">-</span></p>
+                </div>
             </div>
         </div>
     </div>
@@ -314,41 +311,37 @@
         });
     }
 
-    function viewDetail(id) {
-        $.get(`/pembayaran/${id}/edit`, function (data) {
-            // Data utama
-            $('#det_bulan').text(data.bulan);
-            $('#det_id').text('ID: #PLG-' + data.no_pelanggan);
-            $('#det_awal').text(data.stand_meter_awal);
-            $('#det_akhir').text(data.stand_meter_akhir);
-            $('#det_total').text(data.stand_meter_total + ' m³');
-
-            // Format Mata Uang
-            const formattedPrice = new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0
-            }).format(data.total_tagihan);
-            $('#det_tagihan').text(formattedPrice);
-
-            // Data Relasi (Diambil dari AJAX response)
-            // Catatan: Pastikan Controller me-return data pelanggan & pengelola
+    // Tampilkan Detail
+    function showDetail(id) {
+        $.get(`/pembayaran/${id}`, function (data) {
+            // Data dari relasi Eloquent 'pelanggan'
             $('#det_nama').text(data.pelanggan.nama_pelanggan);
-            $('#det_alamat').text(data.pelanggan.alamat_pelanggan);
-            $('#det_petugas').text(data.pengelola.nama_pengelola);
+            $('#det_bulan').text(data.bulan);
 
-            // Format Tanggal
-            const tgl = new Date(data.tanggal_pembayaran);
-            $('#det_tgl').text(tgl.toLocaleDateString('id-ID'));
+            // Data teknis stand meter
+            $('#det_awal').text(data.stand_meter_awal + " m³");
+            $('#det_akhir').text(data.stand_meter_akhir + " m³");
+            $('#det_total_m3').text(data.stand_meter_total + " m³");
 
-            // Tampilkan Modal
-            document.getElementById('modalDetail').classList.remove('hidden');
+            // Format Rupiah
+            $('#det_bayar').text("Rp " + parseInt(data.total_tagihan).toLocaleString('id-ID'));
+
+            // Data dari relasi Eloquent 'pengelola'
+            $('#det_petugas').text(data.pengelola ? data.pengelola.nama_pengelola : 'Sistem');
+
+            // Timestamp standar Laravel
+            $('#det_created').text(new Date(data.created_at).toLocaleString('id-ID'));
+            $('#det_updated').text(new Date(data.updated_at).toLocaleString('id-ID'));
+
+            $('#modalDetail').removeClass('hidden');
         });
     }
 
     function closeDetail() {
-        document.getElementById('modalDetail').classList.add('hidden');
+        $('#modalDetail').addClass('hidden');
     }
+
+
 
     $(document).ready(function () {
         $("#searchPembayaran").on("keyup", function () {

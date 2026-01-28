@@ -57,13 +57,11 @@
                     <i class="fas fa-user-shield"></i> Data Pengelola
                 </a>
 
-                <!-- <div class="pt-4 pb-2 text-xs font-semibold text-slate-400 uppercase px-4">Laporan</div> -->
-
-                <!-- <a href="#"
+                <a href="{{ route('pengeluaran.index') }}"
                     class="flex items-center gap-3 px-4 py-3 transition rounded-xl 
-       {{ request()->is('laporan*') ? 'text-blue-600 bg-blue-50 font-medium' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' }}">
-                    <i class="fas fa-chart-line"></i> Rekap Tagihan
-                </a> -->
+       {{ request()->routeIs('pengeluaran.*') ? 'text-blue-600 bg-blue-50 font-medium' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' }}">
+                    <i class="fas fa-chart-line"></i> Pengeluaran
+                </a>
             </nav>
 
             <div class="absolute bottom-0 w-full p-4 border-t border-slate-100">
